@@ -1,0 +1,6 @@
+name: ServerInstances
+author: LimeGlass
+description: A premium cloud server network addon for Skungee.
+version: 1.0.0
+main: me.limeglass.serverinstances.ServerInstances
+depend: [Skungee]

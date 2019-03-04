@@ -1,0 +1,81 @@
+# Skungee (Bungeecord) - The #1 Skript addon for Bungeecord.
+
+# ServerInstances is like a cloud server system built into Skungee. You can create servers and add them to Bungeecord with simple Skript syntax.
+# You can manage and control these servers through Skungee. This configuration file will allow you to define the defaults of the servers.
+
+# This is a massive expansion to Skungee so it may be buggy at in first initial releases, more additions will constantly be added over time.
+
+#-----------------------------------------------------------------------------------------------------------------------------------------
+#                                                                 TUTORIAL
+#-----------------------------------------------------------------------------------------------------------------------------------------
+#
+#                 So lets start off with explaining how the ServerInstances work and how you should be setting up these bad boys.
+#               First under the plugins/Skungee/ServerInstances/templates/ directory, you need to make a new directory for a server.
+#                       This directory should be a normal name as this will be where a Skript Syntax looks for the name.
+#                     Like `template "Example"` and the directory is named plugins/Skungee/ServerInstances/templates/Example
+# These will be considered Templates, when you call one of these Templates, Skungee will copy a Template over to the plugins/Skungee/ServerInstances/running-servers/ directory.
+#       The plugins/Skungee/ServerInstances/running-servers/ directory should not be touched as this is like a temporarily folder for running servers.
+#                                You may delete servers within this folder if the Bungeecord proxy has been stopped.
+#
+#                   In order for ServerInstances to track and connect to Skungee, the manditory files needed in a template are
+#                        server.properties and the actual server jar which needs to match the option `jar-name` set below.
+#                     This doesn't mean you only need those files, you can put server folders as templates and it will work.
+#         These are just the bare minimum files that are needed. If they're not in the template folder, ServerInstances will not start that server.
+#
+#                         Skungee NEEDS to be installed and configured on these templates, without that this wont work.
+#           ServerInstances also needs the Recievers option enabled within these Skungees in order for the syntax to get sent to them.
+#
+#-----------------------------------------------------------------------------------------------------------------------------------------
+# The version is to help determine which version this configuration is. Please do not modify this value.
+configuration-version: 2
+
+# Disables the message stating that ServerInstances has hooked into Skungee.
+DisableRegisteredInfo: false
+
+ServerInstances:
+    # Prints additional information to the main Bungeecord console for ServerInstances.
+    debug: false
+    # The main wrapper for the servers. Current wrappers are: (remote). More soon.
+    # The "default" value will automate to remote.
+    wrapper: default
+    # The dedotaded wam allocated to the servers. This can be modified with the Skript syntax.
+    # Xmx is the maximum amount allocated. Xmx should always be greater than or equal to Xms.
+    default-Xmx: 512M
+    # Xms is the amount allocated to start with.
+    default-Xms: 256M
+    # The range of the ports for the servers (Keep in mind the ports need to be port forwarded or available to you)
+    minimum-port: 25000
+    maximum-port: 27000
+    # The name of all the jars within the server folders.
+    jar-name: spigot.jar
+    # The server that players will get sent to when a ServerInstance gets closed.
+    fallback-server: "Hub"
+    # Should the player only get moved when a ServerInstances server stops, crashes or if it's moving the user?
+    # If this is false then all servers will have this feature. It's similar to a plugin called "MoveMeNow"
+    fallback-instances: true
+    # The message stated to the user when the user gets moved from a ServerInstance to the fallback server due to it stopping, crashing or moving the user.
+    # Placeholders are:
+    #   %previous% - the server they got moved from.
+    #   %kickmsg% - the kick message if the server gave a reasoning.
+    move-message: "&cYou have been moved from the server %previous% to the fallback server Hub due to %kickmsg%"
+    # The maximum amount of server instances that can be running at the same time.
+    max-servers: 25
+    # You can add some command arguments here for the server run command.
+    # The default argument "-DIReallyKnowWhatIAmDoingISwear" allows the server to start up without the outdated delay message.
+    # If you're using PaperSpigot you can add the argument "-Dcom.mojang.eula.agree=true" to allow for the eula to be signed as true.
+    # This argument is great if you're generating servers, otherwise the eula from the server directory will be used like normal.
+    command-arguments:
+        - "-DIReallyKnowWhatIAmDoingISwear"
+        - "-XX:+UseConcMarkSweepGC"
+        
+# If you would like ServerInstances to bind to an exact IP address you can define so here. Ports not excepted.
+address-bind: "localhost"
+
+# The listener is a system that listens for incoming ServerInstances syntax from the Spigot servers.
+# This is needed in order for the Syntaxes to register with ServerInstances.
+# Recommended to leave on automatic. The system will try it's best to set everything up.
+# If it doesn't work, no ports were found that were available to the server.
+# If you want it to run on a defined port, disable automatic and use the port option below it.
+Listener:
+    automatic: true
+    port: 7331
