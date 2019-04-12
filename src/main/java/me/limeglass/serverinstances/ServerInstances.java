@@ -23,7 +23,7 @@ public class ServerInstances extends Plugin {
 	private Configuration configuration;
 	private ServerManager serverManager;
 	private ServerHelper serverHelper;
-	private int CONFIG_VERSION = 1;
+	private int CONFIG_VERSION = 2;
 	private Skungee skungee;
 
 	public void onEnable() {
