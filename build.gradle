@@ -1,26 +1,37 @@
+import org.apache.tools.ant.filters.ReplaceTokens
 apply plugin: 'java-library'
-apply plugin: 'eclipse'
 
 jar.archiveName = project.name + '.jar'
 
 repositories {
-    mavenCentral()
-    jcenter()
-    
-    //Bungeecord
-    maven {
-        url "https://oss.sonatype.org/content/repositories/snapshots"
-    }
+	mavenCentral()
+	jcenter()
+	
+	//Bungeecord
+	maven {
+		url "https://oss.sonatype.org/content/repositories/snapshots"
+	}
+
+	//Jitpack
+	maven {
+		url 'https://jitpack.io'
+	}
+
 }
 
 dependencies {
-	
-	//Nullable annotation
-	compile (group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.annotation', version: '1.1.0')
-	
+
 	//Bungeecord
-	compile (group: 'net.md-5', name: 'bungeecord-api', version: '1.12-SNAPSHOT')
-	
+	implementation (group: 'net.md-5', name: 'bungeecord-api', version: '1.12-SNAPSHOT')
+
 	//Skungee
-	compile files('Skungee.jar')
+	implementation (group: 'com.github.Skungee', name: 'Skungee', version: '1.0.9')
+
+}
+
+processResources {
+	filter ReplaceTokens, tokens: ["version": project.property("version")]
+	from (sourceSets.main.resources.srcDirs) {
+		include '*.yml'
+	}
 }

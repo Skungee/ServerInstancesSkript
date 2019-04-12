@@ -9,25 +9,32 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import me.limeglass.serverinstances.ServerInstances;
-import me.limeglass.serverinstances.managers.InstancesPacketHandler;
 import me.limeglass.skungee.bungeecord.Skungee;
-import me.limeglass.skungee.objects.ServerInstancesPacket;
+import me.limeglass.skungee.objects.packets.ServerInstancesPacket;
+import net.md_5.bungee.config.Configuration;
 
 public class SyntaxListener implements Runnable {
 
-	private InetAddress address;
-	private Socket socket;
+	private final Configuration configuration;
+	private final ServerInstances instance;
+	private final InetAddress address;
+	private final Skungee skungee;
+	private final Socket socket;
 
-	public SyntaxListener(Socket socket) {
+	public SyntaxListener(ServerInstances instance, Socket socket) {
 		this.socket = socket;
+		this.instance = instance;
 		this.address = socket.getInetAddress();
+		this.configuration = Skungee.getConfig();
+		this.skungee = instance.getSkungeeInstance();
 	}
 
 	@Override
 	public void run() {
-		if (Skungee.getConfig().getBoolean("security.breaches.enabled", false)) {
-			List<String> addresses = Skungee.getConfig().getStringList("security.breaches.blacklisted");
-			if (addresses.contains(address.getHostName())) return;
+		if (configuration.getBoolean("security.breaches.enabled", false)) {
+			List<String> addresses = configuration.getStringList("security.breaches.blacklisted");
+			if (addresses.contains(address.getHostName()))
+				return;
 		}
 		try {
 			ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
@@ -36,9 +43,9 @@ public class SyntaxListener implements Runnable {
 			if (object != null) {
 				ServerInstancesPacket packet;
 				try {
-					if (Skungee.getConfig().getBoolean("security.encryption.enabled", false)) {
+					if (configuration.getBoolean("security.encryption.enabled", false)) {
 						byte[] decoded = Base64.getDecoder().decode((byte[]) object);
-						Thread.currentThread().setContextClassLoader(Skungee.getInstance().getClass().getClassLoader());
+						Thread.currentThread().setContextClassLoader(skungee.getClass().getClassLoader());
 						packet = (ServerInstancesPacket) Skungee.getEncrypter().deserialize(decoded);
 					} else {
 						packet = (ServerInstancesPacket) object;
@@ -48,8 +55,8 @@ public class SyntaxListener implements Runnable {
 					return;
 				}
 				if (packet.getPassword() != null) {
-					if (Skungee.getConfig().getBoolean("security.password.hash", true)) {
-						if (Skungee.getConfig().getBoolean("security.password.hashFile", false) && Skungee.getEncrypter().isFileHashed()) {
+					if (configuration.getBoolean("security.password.hash", true)) {
+						if (configuration.getBoolean("security.password.hashFile", false) && Skungee.getEncrypter().isFileHashed()) {
 							if (!Arrays.equals(Skungee.getEncrypter().getHashFromFile(), packet.getPassword())) {
 								incorrectPassword(packet);
 								return;
@@ -60,18 +67,18 @@ public class SyntaxListener implements Runnable {
 						}
 					} else {
 						String password = (String) Skungee.getEncrypter().deserialize(packet.getPassword());
-						if (!password.equals(Skungee.getConfig().getString("security.password.password"))){
+						if (!password.equals(configuration.getString("security.password.password"))){
 							incorrectPassword(packet);
 							return;
 						}
 					}
-				} else if (Skungee.getConfig().getBoolean("security.password.enabled", false)) {
+				} else if (configuration.getBoolean("security.password.enabled", false)) {
 					incorrectPassword(packet);
 					return;
 				}
-				Object packetData = InstancesPacketHandler.handlePacket(packet, socket.getInetAddress());
+				Object packetData = instance.getHandler().handlePacket(packet, socket.getInetAddress());
 				if (packetData != null) {
-					if (Skungee.getConfig().getBoolean("security.encryption.enabled", false)) {
+					if (configuration.getBoolean("security.encryption.enabled", false)) {
 						byte[] serialized = Skungee.getEncrypter().serialize(packetData);
 						objectOutputStream.writeObject(Base64.getEncoder().encode(serialized));
 					} else {
@@ -84,10 +91,11 @@ public class SyntaxListener implements Runnable {
 			socket.close();
 		} catch (IOException | ClassNotFoundException e) {}
 	}
-	
+
 	private void incorrectPassword(ServerInstancesPacket packet) {
-		ServerInstances.consoleMessage("&cA ServerInstancesPacket with an incorrect password has just been recieved and blocked!");
-		ServerInstances.consoleMessage("&cThe packet came from: " + socket.getInetAddress());
-		ServerInstances.consoleMessage("&cThe packet type was: " + packet.getType());
+		instance.consoleMessage("&cA ServerInstancesPacket with an incorrect password has just been recieved and blocked!");
+		instance.consoleMessage("&cThe packet came from: " + socket.getInetAddress());
+		instance.consoleMessage("&cThe packet type was: " + packet.getType());
 	}
+
 }

@@ -8,41 +8,57 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ServerKickEvent;
 import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.event.EventHandler;
 
 public class KickListener implements Listener {
 
+	private final ServerManager serverManager;
+	private final Configuration configuration;
+	private final ProxyServer proxy;
+
+	public KickListener(ServerInstances instance) {
+		this.configuration = instance.getConfiguration();
+		this.serverManager = instance.getServerManager();
+		this.proxy = instance.getProxy();
+	}
+
 	@EventHandler
 	public void onServerKickEvent(ServerKickEvent event) {
-		ServerInfo kickedFrom = null;
-		if (event.getPlayer().getServer() != null) {
-			kickedFrom = event.getPlayer().getServer().getInfo();
-		} else if (ServerInstances.getInstance().getProxy().getReconnectHandler() != null) {
-			kickedFrom = ServerInstances.getInstance().getProxy().getReconnectHandler().getServer(event.getPlayer());
+		ProxiedPlayer player = event.getPlayer();
+		ServerInfo kickedFrom;
+		if (player.getServer() != null) {
+			kickedFrom = player.getServer().getInfo();
+		} else if (proxy.getReconnectHandler() != null) {
+			kickedFrom = proxy.getReconnectHandler().getServer(player);
 		} else {
-			kickedFrom = AbstractReconnectHandler.getForcedHost(event.getPlayer().getPendingConnection());
-			if (kickedFrom == null) {
-				kickedFrom = ProxyServer.getInstance().getServerInfo(event.getPlayer().getPendingConnection().getListener().getServerPriority().get(0));
-			}
+			kickedFrom = AbstractReconnectHandler.getForcedHost(player.getPendingConnection());
+			if (kickedFrom == null)
+				kickedFrom = proxy.getServerInfo(player.getPendingConnection().getListener().getServerPriority().get(0));
 		}
-		ServerInfo fallback = ServerInstances.getInstance().getProxy().getServerInfo(ServerInstances.getConfiguration().getString("ServerInstances.fallback-server", "Hub"));
-		if (fallback == null) return;
-		if (kickedFrom != null && kickedFrom.equals(fallback)) return;
+		ServerInfo fallback = proxy.getServerInfo(configuration.getString("ServerInstances.fallback-server", "Hub"));
+		if (fallback == null || kickedFrom == null)
+			return;
+		if (kickedFrom.equals(fallback))
+			return;
 		String reason = BaseComponent.toLegacyText(event.getKickReasonComponent());
-		String[] message = ServerInstances.getConfiguration().getString("ServerInstances.move-message").replace("%kickmsg%", reason).replace("%previous%", kickedFrom.getName()).split("\n");
-		if (ServerInstances.getConfiguration().getBoolean("ServerInstances.fallback-instances", true)) {
-			if (!ServerManager.getInstances().containsKey(kickedFrom.getName())) {
+		String[] messages = configuration.getString("ServerInstances.move-message")
+				.replace("%previous%", kickedFrom.getName())
+				.replace("%kickmsg%", reason)
+				.split("\n");
+		if (configuration.getBoolean("ServerInstances.fallback-instances", true)) {
+			if (!serverManager.getInstances().containsKey(kickedFrom.getName()))
 				return;
-			}
 		}
 		event.setCancelled(true);
 		event.setCancelServer(fallback);
-		if (!(message.length == 1 && message[0].equals(""))) {
-			for (String line : message) {
-				event.getPlayer().sendMessage(new TextComponent(Skungee.cc(line)));
-			}
+		if (messages.length > 0 && !messages[0].equals("")) {
+			for (String line : messages)
+				player.sendMessage(new TextComponent(Skungee.cc(line)));
 		}
 	}
+
 }
