@@ -28,6 +28,11 @@ public class ServerInstances extends Plugin {
 
 	public void onEnable() {
 		instance = this;
+		Plugin plugin = getProxy().getPluginManager().getPlugin("Skungee");
+		if (plugin == null) {
+			consoleMessage("Skungee could not be found, make sure it's installed and loaded.");
+			return;
+		}
 		loadConfiguration();
 		skungee = Skungee.getInstance();
 		serverHelper = new ServerHelper(this);

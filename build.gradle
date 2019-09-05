@@ -1,5 +1,6 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 apply plugin: 'java-library'
+apply plugin: 'eclipse'
 
 jar.archiveName = project.name + '.jar'
 
@@ -22,10 +23,10 @@ repositories {
 dependencies {
 
 	//Bungeecord
-	implementation (group: 'net.md-5', name: 'bungeecord-api', version: '1.12-SNAPSHOT')
+	implementation (group: 'net.md-5', name: 'bungeecord-api', version: '1.14-SNAPSHOT')
 
 	//Skungee
-	implementation (group: 'com.github.Skungee', name: 'Skungee', version: '1.0.9')
+	implementation (group: 'com.github.Skungee', name: 'Skungee', version: '1.0.10')
 
 }
 

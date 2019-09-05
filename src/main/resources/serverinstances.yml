@@ -1,5 +1,3 @@
-# Skungee (Bungeecord) - The #1 Skript addon for Bungeecord.
-
 # ServerInstances is like a cloud server system built into Skungee. You can create servers and add them to Bungeecord with simple Skript syntax.
 # You can manage and control these servers through Skungee. This configuration file will allow you to define the defaults of the servers.
 
