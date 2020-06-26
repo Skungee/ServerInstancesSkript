@@ -7,7 +7,12 @@ jar.archiveName = project.name + '.jar'
 repositories {
 	mavenCentral()
 	jcenter()
-	
+
+	//BungeeTabListPlus for Skungee
+	maven {
+		url 'http://nexus.codecrafter47.de/content/repositories/public/'
+	}
+
 	//Bungeecord
 	maven {
 		url "https://oss.sonatype.org/content/repositories/snapshots"
