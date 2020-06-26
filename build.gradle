@@ -26,7 +26,7 @@ dependencies {
 	implementation (group: 'net.md-5', name: 'bungeecord-api', version: '1.15-SNAPSHOT')
 
 	//Skungee
-	implementation (group: 'com.github.Skungee', name: 'Skungee', version: '1.0.11')
+	implementation (group: 'com.github.Skungee', name: 'Skungee', version: '1.0.14')
 
 }
 
