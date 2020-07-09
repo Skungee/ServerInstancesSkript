@@ -10,6 +10,7 @@ import me.limeglass.skungee.objects.SkungeePlayer;
 import me.limeglass.skungee.objects.packets.ServerInstancesPacket;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ServerConnectRequest;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ServerConnectEvent.Reason;
 
 public class InstancesPacketHandler {
@@ -23,7 +24,7 @@ public class InstancesPacketHandler {
 	}
 
 	public Object handlePacket(ServerInstancesPacket packet, InetAddress address) {
-		instance.debugMessage("Recieved " + packet.getPacketDebug());
+		instance.debugMessage("&2Recieved " + packet.getPacketDebug());
 		switch (packet.getType()) {
 			case CREATESERVER:
 				if (packet.getObject() == null || packet.getSetObject() == null)
@@ -74,8 +75,15 @@ public class InstancesPacketHandler {
 									.reason(Reason.PLUGIN)
 									.retry(true)
 									.build();
-							for (SkungeePlayer player : players)
-								ProxyServer.getInstance().getPlayer(player.getUUID()).connect(connection);
+							for (SkungeePlayer player : players) {
+								ProxiedPlayer proxied = ProxyServer.getInstance().getPlayer(player.getUUID());
+								if (proxied == null) {
+									instance.consoleMessage("The UUID of the SkungeePlayer did not match the UUID on the Bungeecord." +
+											"Please make sure you have the bungeecord option on Spigot enabled and Bungeecord in online mode, or negate of those if using cracked.");
+									continue;
+								}
+								proxied.connect(connection);
+							}
 						});
 				break;
 		}

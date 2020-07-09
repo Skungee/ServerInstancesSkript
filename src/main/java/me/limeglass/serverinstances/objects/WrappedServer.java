@@ -435,6 +435,7 @@ public class WrappedServer {
 			errors = process.getErrorStream();
 			outputStream = process.getOutputStream();
 			serverManager.getProcesses().add(process);
+			serverManager.addInstance(this);
 			//TODO make a system to read the console of this process
 		} catch (IOException exception) {
 			instance.consoleMessage("Failed to start server: " + name);

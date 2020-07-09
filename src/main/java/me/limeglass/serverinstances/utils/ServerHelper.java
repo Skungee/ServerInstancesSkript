@@ -1,9 +1,7 @@
 package me.limeglass.serverinstances.utils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -33,29 +31,29 @@ public class ServerHelper {
 	}
 
 	private void setupConfig() {
-		FileInputStream input = null;
-		InputStreamReader reader = null;
-		try {
-			file = new File(ProxyServer.getInstance().getPluginsFolder().getParentFile(), "config.yml");
-			input = new FileInputStream(file);
-			reader = new InputStreamReader(input, "ISO-8859-1");
-			configuration = YamlConfiguration.getProvider(YamlConfiguration.class).load(reader);
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (input != null)
-					input.close();
-				if (reader != null)
-					reader.close();
-			} catch (IOException ignored) {}
-		}
+//		FileInputStream input = null;
+//		InputStreamReader reader = null;
 //		try {
 //			file = new File(ProxyServer.getInstance().getPluginsFolder().getParentFile(), "config.yml");
-//			configuration = YamlConfiguration.getProvider(YamlConfiguration.class).load(file);
+//			input = new FileInputStream(file);
+//			reader = new InputStreamReader(input, "ISO-8859-1");
+//			configuration = YamlConfiguration.getProvider(YamlConfiguration.class).load(reader);
 //		} catch (IOException e) {
 //			e.printStackTrace();
+//		} finally {
+//			try {
+//				if (input != null)
+//					input.close();
+//				if (reader != null)
+//					reader.close();
+//			} catch (IOException ignored) {}
 //		}
+		try {
+			file = new File(ProxyServer.getInstance().getPluginsFolder().getParentFile(), "config.yml");
+			configuration = YamlConfiguration.getProvider(YamlConfiguration.class).load(file);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void saveConfig() {
@@ -75,9 +73,10 @@ public class ServerHelper {
 	@SuppressWarnings("deprecation")
 	public void addServer(ServerInfo serverInfo) {
 		String name = serverInfo.getName();
-		if (!getServerInfo(name).isPresent())
+		if (getServerInfo(name).isPresent())
 			return;
 		getServers().put(name, serverInfo);
+		ProxyServer.getInstance().getServers().put(name, serverInfo);
 		if (configuration == null)
 			return;
 		configuration.set("servers." + name + ".motd", serverInfo.getMotd().replace(ChatColor.COLOR_CHAR, '&'));
@@ -95,6 +94,7 @@ public class ServerHelper {
 			player.connect(getServers().get(instance.getConfiguration().getString("ServerInstances.fallback-server", "Hub")));
 		}
 		getServers().remove(name);
+		ProxyServer.getInstance().getServers().remove(name);
 		if (configuration == null)
 			return;
 		configuration.set("servers." + name, null);
@@ -102,7 +102,7 @@ public class ServerHelper {
 	}
 
 	public Map<String, ServerInfo> getServers() {
-		return ProxyServer.getInstance().getServers();
+		return ProxyServer.getInstance().getConfigurationAdapter().getServers();
 	}
 
 }

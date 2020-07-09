@@ -11,6 +11,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import com.google.common.collect.Sets;
+
 import me.limeglass.serverinstances.ServerInstances;
 import me.limeglass.serverinstances.listeners.SyntaxListener;
 import me.limeglass.serverinstances.objects.WrappedServer;
@@ -101,17 +103,18 @@ public class ServerManager {
 			InetSocketAddress address = new InetSocketAddress(configuration.getString("address-bind", InetAddress.getLocalHost().getHostAddress()), server.getPort());
 			ServerInfo serverInfo = instance.getProxy().constructServerInfo(name, address, server.getMotd(), false);
 			serverHelper.addServer(serverInfo);
+			instance.consoleMessage("Started server " + name + " on port " + server.getPort());
 		} catch (UnknownHostException exception) {
 			Skungee.exception(exception, "Could not find the system's local host. Due to this the server will not be added to the Bungeecord, but still run.");
 		}
 	}
 
 	public void shutdownAll() {
-		Iterator<WrappedServer> iterator = instances.iterator();
-		while (iterator.hasNext()) {
-			iterator.next().shutdown();
-			iterator.remove();
+		for (Iterator<WrappedServer> iterator = Sets.newConcurrentHashSet(instances).iterator(); iterator.hasNext();) {
+			WrappedServer server = iterator.next();
+			server.shutdown(server.isAutoSave());
 		}
+		instances.clear();
 	}
 
 	public void removeInstance(WrappedServer server) {
