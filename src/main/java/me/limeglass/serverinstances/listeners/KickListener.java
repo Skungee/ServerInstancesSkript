@@ -50,7 +50,7 @@ public class KickListener implements Listener {
 				.replace("%kickmsg%", reason)
 				.split("\n");
 		if (configuration.getBoolean("ServerInstances.fallback-instances", true)) {
-			if (!serverManager.getInstances().containsKey(kickedFrom.getName()))
+			if (!serverManager.containsName(kickedFrom.getName()))
 				return;
 		}
 		event.setCancelled(true);

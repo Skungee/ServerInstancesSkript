@@ -7,10 +7,8 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.UnknownHostException;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 import me.limeglass.serverinstances.ServerInstances;
@@ -26,7 +24,7 @@ import net.md_5.bungee.config.Configuration;
 public class ServerManager {
 
 	private final File INSTANCES_FOLDER, SAVED_FOLDER, TEMPLATE_FOLDER, RUNNING_SERVERS_FOLDER, RUN_SCRIPTS;
-	private final Map<String, WrappedServer> instances = new HashMap<>();
+	private final Set<WrappedServer> instances = new HashSet<>();
 	private final Set<Process> processes = new HashSet<>();
 	private final Configuration configuration;
 	private final ServerHelper serverHelper;
@@ -80,7 +78,7 @@ public class ServerManager {
 			public void run() {
 				if (instances.isEmpty())
 					return;
-				for (WrappedServer server : instances.values()) {
+				for (WrappedServer server : instances) {
 					server.shutdown();
 					try {
 						Thread.sleep(2000L);
@@ -91,10 +89,14 @@ public class ServerManager {
 		});
 	}
 
+	public boolean containsName(String name) {
+		return instances.stream().anyMatch(server -> server.getName().equalsIgnoreCase(name));
+	}
+
 	public void addInstance(WrappedServer server) {
 		String name = server.getName();
-		if (!instances.containsKey(name))
-			instances.put(name, server);
+		if (!containsName(name))
+			instances.add(server);
 		try {
 			InetSocketAddress address = new InetSocketAddress(configuration.getString("address-bind", InetAddress.getLocalHost().getHostAddress()), server.getPort());
 			ServerInfo serverInfo = instance.getProxy().constructServerInfo(name, address, server.getMotd(), false);
@@ -105,7 +107,7 @@ public class ServerManager {
 	}
 
 	public void shutdownAll() {
-		Iterator<WrappedServer> iterator = instances.values().iterator();
+		Iterator<WrappedServer> iterator = instances.iterator();
 		while (iterator.hasNext()) {
 			iterator.next().shutdown();
 			iterator.remove();
@@ -113,13 +115,12 @@ public class ServerManager {
 	}
 
 	public void removeInstance(WrappedServer server) {
-		String name = server.getName();
-		instances.remove(name);
-		serverHelper.removeServer(name);
+		instances.remove(server);
+		serverHelper.removeServer(server.getName());
 	}
 
-	public Map<String, WrappedServer> getInstances() {
-		return Collections.unmodifiableMap(instances);
+	public Set<WrappedServer> getInstances() {
+		return Collections.unmodifiableSet(instances);
 	}
 
 	public File getServerInstancesFolder() {
