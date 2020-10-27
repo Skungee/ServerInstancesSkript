@@ -1,0 +1,4 @@
+name: ServerInstances
+author: Skungee
+version: @version@
+main: com.skungee.serverinstances.bungeecord.ServerInstancesBungeecord
