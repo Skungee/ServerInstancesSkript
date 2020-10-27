@@ -56,6 +56,7 @@ public class EffCreateServer extends Effect {
 					array.add(template);
 				object.add("templates", array);
 				object.addProperty("serverinstances", instance.getDescription().getVersion());
+				object.addProperty("type", "create");
 				return object;
 			}
 		};
