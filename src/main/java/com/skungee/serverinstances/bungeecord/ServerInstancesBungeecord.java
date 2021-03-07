@@ -9,11 +9,10 @@ import com.sitrica.japson.gson.JsonArray;
 import com.sitrica.japson.gson.JsonObject;
 import com.sitrica.japson.shared.Executor;
 import com.sitrica.japson.shared.Handler;
-import com.skungee.proxy.ProxyPlatform;
+import com.skungee.bungeecord.BungeeSkungee;
 import com.skungee.serverinstances.ServerInstances;
 import com.skungee.serverinstances.objects.Template;
 import com.skungee.shared.Packets;
-import com.skungee.shared.Skungee;
 
 import net.md_5.bungee.api.plugin.Plugin;
 
@@ -31,8 +30,7 @@ public class ServerInstancesBungeecord extends Plugin {
 			e.printStackTrace();
 			return;
 		}
-		ProxyPlatform platform = (ProxyPlatform) Skungee.getPlatform();
-		platform.getJapsonServer().registerHandlers(new Executor(Packets.API.getPacketId()) {
+		BungeeSkungee.getAPI().registerHandler(new Executor(Packets.API.getPacketId()) {
 			@Override
 			public void execute(InetAddress address, int port, JsonObject object) {
 				if (!object.has("serverinstances") || !object.has("templates") || !object.has("type"))
@@ -48,7 +46,7 @@ public class ServerInstancesBungeecord extends Plugin {
 						return;
 					try {
 						serverInstances.createInstance(optional.get());
-					} catch (IOException e) {
+					} catch (IOException | IllegalAccessException e) {
 						e.printStackTrace();
 					}
 				});
