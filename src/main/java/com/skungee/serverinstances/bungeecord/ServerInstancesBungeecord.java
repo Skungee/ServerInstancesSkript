@@ -14,6 +14,7 @@ import com.skungee.serverinstances.ServerInstances;
 import com.skungee.serverinstances.objects.Template;
 import com.skungee.shared.Packets;
 
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class ServerInstancesBungeecord extends Plugin {
@@ -30,7 +31,12 @@ public class ServerInstancesBungeecord extends Plugin {
 			e.printStackTrace();
 			return;
 		}
-		BungeeSkungee.getAPI().registerHandler(new Executor(Packets.API.getPacketId()) {
+		Plugin skungee = getProxy().getPluginManager().getPlugin("Skungee");
+		if (skungee == null) {
+			getProxy().getConsole().sendMessage(new TextComponent("Skungee is not currently enabled. Disabling ServerInstances."));
+			return;
+		}
+		((BungeeSkungee)skungee).getJapsonServer().registerHandlers(new Executor(Packets.API.getPacketId()) {
 			@Override
 			public void execute(InetAddress address, int port, JsonObject object) {
 				if (!object.has("serverinstances") || !object.has("templates") || !object.has("type"))
