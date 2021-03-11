@@ -6,9 +6,9 @@ import java.util.concurrent.TimeoutException;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
-import com.sitrica.japson.gson.JsonArray;
-import com.sitrica.japson.gson.JsonObject;
-import com.sitrica.japson.shared.Packet;
+import com.skungee.japson.gson.JsonArray;
+import com.skungee.japson.gson.JsonObject;
+import com.skungee.japson.shared.Packet;
 import com.skungee.shared.Packets;
 import com.skungee.spigot.SpigotSkungee;
 

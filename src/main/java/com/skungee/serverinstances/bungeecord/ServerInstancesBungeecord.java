@@ -5,11 +5,11 @@ import java.net.InetAddress;
 import java.sql.SQLException;
 import java.util.Optional;
 
-import com.sitrica.japson.gson.JsonArray;
-import com.sitrica.japson.gson.JsonObject;
-import com.sitrica.japson.shared.Executor;
-import com.sitrica.japson.shared.Handler;
 import com.skungee.bungeecord.BungeeSkungee;
+import com.skungee.japson.gson.JsonArray;
+import com.skungee.japson.gson.JsonObject;
+import com.skungee.japson.shared.Executor;
+import com.skungee.japson.shared.Handler;
 import com.skungee.serverinstances.ServerInstances;
 import com.skungee.serverinstances.objects.Template;
 import com.skungee.shared.Packets;
@@ -36,7 +36,7 @@ public class ServerInstancesBungeecord extends Plugin {
 			getProxy().getConsole().sendMessage(new TextComponent("Skungee is not currently enabled. Disabling ServerInstances."));
 			return;
 		}
-		((BungeeSkungee)skungee).getJapsonServer().registerHandlers(new Executor(Packets.API.getPacketId()) {
+		((BungeeSkungee)skungee).getAPI().registerHandler(new Executor(Packets.API.getPacketId()) {
 			@Override
 			public void execute(InetAddress address, int port, JsonObject object) {
 				if (!object.has("serverinstances") || !object.has("templates") || !object.has("type"))
