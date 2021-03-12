@@ -8,8 +8,6 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import com.skungee.japson.gson.JsonArray;
 import com.skungee.japson.gson.JsonObject;
-import com.skungee.japson.shared.Packet;
-import com.skungee.shared.Packets;
 import com.skungee.spigot.SpigotSkungee;
 
 import ch.njol.skript.Skript;
@@ -47,21 +45,15 @@ public class EffCreateServer extends Effect {
 	@Override
 	protected void execute(Event event) {
 		SpigotSkungee instance = SpigotSkungee.getInstance();
-		Packet packet = new Packet(Packets.API.getPacketId()) {
-			@Override
-			public JsonObject toJson() {
-				JsonObject object = new JsonObject();
-				JsonArray array = new JsonArray();
-				for (String template : templates.getArray(event))
-					array.add(template);
-				object.add("templates", array);
-				object.addProperty("serverinstances", instance.getDescription().getVersion());
-				object.addProperty("type", "create");
-				return object;
-			}
-		};
+		JsonObject object = new JsonObject();
+		JsonArray array = new JsonArray();
+		for (String template : templates.getArray(event))
+			array.add(template);
+		object.add("templates", array);
+		object.addProperty("serverinstances", instance.getDescription().getVersion());
+		object.addProperty("type", "create");
 		try {
-			instance.getJapsonClient().sendPacket(packet);
+			instance.getAPI().sendJson(object);
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			instance.debugMessage("Failed to send start template packet");
 		}

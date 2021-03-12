@@ -9,8 +9,6 @@ import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.skungee.japson.gson.JsonObject;
-import com.skungee.japson.shared.ReturnablePacket;
-import com.skungee.shared.Packets;
 import com.skungee.spigot.SpigotSkungee;
 
 import ch.njol.skript.Skript;
@@ -54,28 +52,18 @@ public class ExprTemplates extends SimpleExpression<String> {
 	@Nullable
 	protected String[] get(Event event) {
 		SpigotSkungee instance = SpigotSkungee.getInstance();
-		ReturnablePacket<Set<String>> packet = new ReturnablePacket<Set<String>>(Packets.API.getPacketId()) {
-			@Override
-			public JsonObject toJson() {
-				JsonObject object = new JsonObject();
-				object.addProperty("serverinstances", instance.getDescription().getVersion());
-				object.addProperty("type", "templates");
-				return object;
-			}
-
-			@Override
-			public Set<String> getObject(JsonObject object) {
+		JsonObject object = new JsonObject();
+		object.addProperty("serverinstances", instance.getDescription().getVersion());
+		object.addProperty("type", "templates");
+		try {
+			return instance.getAPI().sendPacket(object, json -> {
 				Set<String> templates = new HashSet<>();
-				object.get("templates").getAsJsonArray().forEach(element -> {
+				json.get("templates").getAsJsonArray().forEach(element -> {
 					String template = element.getAsString();
 					templates.add(template);
 				});
-				return templates;
-			}
-		};
-		try {
-			Set<String> templates = instance.getJapsonClient().sendPacket(packet);
-			return templates.toArray(new String[templates.size()]);
+				return templates.toArray(new String[templates.size()]);
+			});
 		} catch (TimeoutException | InterruptedException | ExecutionException e) {
 			instance.debugMessage("Failed to send template expression packet");
 			return null;
