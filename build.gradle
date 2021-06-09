@@ -69,7 +69,7 @@ dependencies {
 
 	//Bungeecord
 	implementation (group: 'net.md-5', name: 'bungeecord-protocol', version: '1.16-R0.5-SNAPSHOT')
-	implementation (group: 'net.md-5', name: 'bungeecord-api', version: '1.16-R0.5-SNAPSHOT')
+	implementation (group: 'net.md-5', name: 'bungeecord-api', version: '1.17-R0.1-SNAPSHOT')
 
 	// Skungee
 	implementation (group: 'com.skungee', name: 'skungee-beta', version: '2.0.0-ALPHA-16.2') {
