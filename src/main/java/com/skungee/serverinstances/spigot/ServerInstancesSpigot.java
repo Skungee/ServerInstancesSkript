@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.skungee.shared.Skungee;
 import com.skungee.spigot.SpigotSkungee;
 
 import ch.njol.skript.Skript;
@@ -17,7 +16,7 @@ public class ServerInstancesSpigot extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		instance = this;
-		skungee = (SpigotSkungee) Skungee.getPlatform();
+		skungee = SpigotSkungee.getInstance();
 		try {
 			Skript.registerAddon(this).loadClasses("com.skungee.serverinstances.spigot", "elements");
 		} catch (IOException e) {
