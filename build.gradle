@@ -7,8 +7,6 @@ plugins {
 	id 'java'
 }
 
-jar.archiveName = project.name + '.jar'
-
 repositories {
 	mavenCentral()
 
@@ -20,6 +18,11 @@ repositories {
 	//Bungeecord
 	maven {
 		url "https://oss.sonatype.org/content/repositories/snapshots"
+	}
+
+	// Skript
+	maven {
+		url 'https://repo.skriptlang.org/releases'
 	}
 
 	// Jitpack
@@ -58,20 +61,20 @@ dependencies {
 	//Nullable annotation
 	implementation (group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.annotation', version: '1.1.0')
 
-	// Spigot
-	implementation (group: 'org.spigotmc', name: 'spigot-api', version: '1.17-R0.1-SNAPSHOT')
+	//Spigot/Bukkit
+	implementation (group: 'org.spigotmc', name: 'spigot-api', version: '1.19.4-R0.1-SNAPSHOT')
 
-	// Skript
-	implementation (group: 'com.github.SkriptLang.Skript', name: 'Skript', version: '2.6-alpha1') {
+	//Skript
+	implementation (group: 'com.github.SkriptLang', name: 'Skript', version: '2.7.0-beta2') {
 		transitive = false
 	}
 
 	//Bungeecord
-	implementation (group: 'net.md-5', name: 'bungeecord-protocol', version: '1.17-R0.1-SNAPSHOT')
-	implementation (group: 'net.md-5', name: 'bungeecord-api', version: '1.17-R0.1-SNAPSHOT')
+	implementation (group: 'net.md-5', name: 'bungeecord-protocol', version: '1.19-R0.1-SNAPSHOT')
+	implementation (group: 'net.md-5', name: 'bungeecord-api', version: '1.19-R0.1-SNAPSHOT')
 
 	// Skungee
-	implementation (group: 'com.skungee', name: 'skungee', version: '2.0.0-BETA-1') {
+	implementation (group: 'com.skungee', name: 'skungee', version: '2.0.0-BETA-4') {
 		exclude group: 'com.sitrica', module: 'japson'
 	}
 
@@ -92,8 +95,7 @@ processResources {
 
 shadowJar {
 	configurations = [project.configurations.shadow]
-	archiveVersion = version
-	baseName = project.name
-	classifier = ''
+	archiveVersion = project.property("version")
+	archiveBaseName = project.name + ".jar"
 	minimize()
 }
