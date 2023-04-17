@@ -43,8 +43,10 @@ public class ServerInstancesBungeecord extends Plugin {
 					return;
 				if (!object.get("type").getAsString().equals("create"))
 					return;
-				if (!object.get("serverinstances").getAsString().equals(getDescription().getVersion()))
-					throw new IllegalStateException("The versions of ServerInstances from the incoming packet on Spigot did not match that of the ServerInstances version running on the Proxy.");
+				if (!object.get("serverinstances").getAsString().equals(getDescription().getVersion())) {
+					skungee.getLogger().severe("The versions of ServerInstances from the incoming packet on Spigot did not match that of the ServerInstances version running on the Proxy. '" + getDescription().getVersion() + "'");
+					return;
+				}
 				object.get("templates").getAsJsonArray().forEach(element -> {
 					String name = element.getAsString();
 					Optional<Template> optional = serverInstances.getTemplates().stream().filter(template -> template.getName().equals(name)).findFirst();
@@ -64,8 +66,10 @@ public class ServerInstancesBungeecord extends Plugin {
 					return null;
 				if (!object.get("type").getAsString().equals("templates"))
 					return null;
-				if (!object.get("serverinstances").getAsString().equals(getDescription().getVersion()))
-					throw new IllegalStateException("The versions of ServerInstances from the incoming packet on Spigot did not match that of the ServerInstances version running on the Proxy.");
+				if (!object.get("serverinstances").getAsString().equals(getDescription().getVersion())) {
+					skungee.getLogger().severe("The versions of ServerInstances from the incoming packet on Spigot did not match that of the ServerInstances version running on the Proxy. '" + getDescription().getVersion() + "'");
+					return null;
+				}
 				JsonObject returning = new JsonObject();
 				JsonArray templates = new JsonArray();
 				serverInstances.getTemplates().forEach(template -> templates.add(template.getName()));

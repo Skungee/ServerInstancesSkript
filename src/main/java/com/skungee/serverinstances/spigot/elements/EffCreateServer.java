@@ -8,6 +8,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import com.skungee.japson.gson.JsonArray;
 import com.skungee.japson.gson.JsonObject;
+import com.skungee.serverinstances.spigot.ServerInstancesSpigot;
 import com.skungee.spigot.SpigotSkungee;
 
 import ch.njol.skript.Skript;
@@ -50,7 +51,7 @@ public class EffCreateServer extends Effect {
 		for (String template : templates.getArray(event))
 			array.add(template);
 		object.add("templates", array);
-		object.addProperty("serverinstances", instance.getDescription().getVersion());
+		object.addProperty("serverinstances", ServerInstancesSpigot.getInstance().getDescription().getVersion());
 		object.addProperty("type", "create");
 		try {
 			instance.getAPI().sendJson(object);
